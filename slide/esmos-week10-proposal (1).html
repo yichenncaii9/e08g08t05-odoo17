@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESMOS Healthcare Go-Live</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;0,9..144,900;1,9..144,400&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cream: #faf8f4; --warm-white: #f2efe8; --charcoal: #1d1b18; --mid: #5c5750; --light: #948e85;
+            --accent: #d4321c; --accent-bg: #fdf0ed; --teal: #1a7a6d; --teal-bg: #edf7f5;
+            --font-heading: 'Fraunces', Georgia, serif; --font-body: 'Work Sans', sans-serif;
+            --title-size: clamp(2.8rem, 7vw, 6rem); --h2-size: clamp(1.8rem, 4.5vw, 3.2rem);
+            --h3-size: clamp(1.2rem, 2.5vw, 1.7rem); --body-size: clamp(1rem, 1.8vw, 1.35rem);
+            --small-size: clamp(0.8rem, 1.2vw, 1rem); --label-size: clamp(0.65rem, 0.9vw, 0.8rem);
+            --slide-padding: clamp(2rem, 6vw, 7rem); --content-gap: clamp(1rem, 3vw, 2.5rem);
+        }
+        *{margin:0;padding:0;box-sizing:border-box}
+        html,body{height:100%;overflow-x:hidden}
+        html{scroll-snap-type:y mandatory;scroll-behavior:smooth}
+        body{font-family:var(--font-body);background:var(--cream);color:var(--charcoal);-webkit-font-smoothing:antialiased}
+        .slide{width:100vw;height:100vh;height:100dvh;overflow:hidden;scroll-snap-align:start;display:flex;flex-direction:column;position:relative;background:var(--cream)}
+        .slide-content{flex:1;display:flex;flex-direction:column;justify-content:center;max-height:100%;overflow:hidden;padding:var(--slide-padding)}
+        @media(max-height:700px){:root{--slide-padding:clamp(1rem,4vw,3rem);--h2-size:clamp(1.4rem,3.5vw,2.2rem);--body-size:clamp(0.85rem,1.4vw,1.1rem)}}
+        @media(max-height:600px){:root{--slide-padding:clamp(0.8rem,3vw,2rem);--h2-size:clamp(1.2rem,3vw,1.8rem);--body-size:clamp(0.78rem,1.2vw,1rem)}.nav-dots{display:none}}
+        @media(max-height:500px){:root{--slide-padding:clamp(0.6rem,2.5vw,1.5rem);--h2-size:clamp(1rem,2.5vw,1.5rem)}}
+        @media(max-width:700px){:root{--title-size:clamp(2rem,9vw,3.5rem)}.split,.split-wide{grid-template-columns:1fr!important}}
+        @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.2s!important}html{scroll-behavior:auto}}
+        .reveal{opacity:0;transform:translateY(16px);transition:opacity 0.8s cubic-bezier(0.16,1,0.3,1),transform 0.8s cubic-bezier(0.16,1,0.3,1)}
+        .slide.visible .reveal{opacity:1;transform:translateY(0)}
+        .reveal:nth-child(2){transition-delay:0.1s}.reveal:nth-child(3){transition-delay:0.2s}.reveal:nth-child(4){transition-delay:0.3s}
+        .progress-bar{position:fixed;top:0;left:0;height:3px;background:var(--accent);z-index:1000;transition:width 0.3s;width:0%}
+        .nav-dots{position:fixed;right:clamp(16px,2.5vw,32px);top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:10px;z-index:100}
+        .nav-dot{width:8px;height:8px;border-radius:50%;background:var(--light);cursor:pointer;transition:all 0.3s;border:none;padding:0}
+        .nav-dot.active{background:var(--accent);transform:scale(1.4)}
+        h1{font-family:var(--font-heading);font-size:var(--title-size);font-weight:900;line-height:1.0;letter-spacing:-0.03em}
+        h2{font-family:var(--font-heading);font-size:var(--h2-size);font-weight:700;line-height:1.1;letter-spacing:-0.02em}
+        h3{font-family:var(--font-heading);font-size:var(--h3-size);font-weight:700;line-height:1.2}
+        p,li{font-size:var(--body-size);line-height:1.6;color:var(--mid)}
+        .label{font-family:var(--font-body);font-size:var(--label-size);font-weight:600;letter-spacing:0.15em;text-transform:uppercase;color:var(--light)}
+        .accent{color:var(--accent)}.teal{color:var(--teal)}
+        .split{display:grid;grid-template-columns:1fr 1fr;gap:clamp(2rem,5vw,5rem);align-items:center}
+        .split-wide{display:grid;grid-template-columns:1.4fr 1fr;gap:clamp(2rem,5vw,5rem);align-items:start}
+        .img-placeholder{width:100%;aspect-ratio:4/3;background:var(--warm-white);border:2px dashed var(--light);border-radius:clamp(8px,1vw,16px);display:flex;align-items:center;justify-content:center;font-family:var(--font-body);font-size:var(--small-size);color:var(--light);font-weight:500;max-height:min(45vh,380px)}
+        .img-placeholder.wide{aspect-ratio:16/9}.img-placeholder.square{aspect-ratio:1/1}
+        .steps{list-style:none;counter-reset:step;display:flex;flex-direction:column;gap:clamp(0.6rem,1.5vh,1.2rem)}
+        .steps li{counter-increment:step;display:flex;gap:clamp(0.8rem,1.5vw,1.2rem);align-items:baseline;font-size:var(--body-size);line-height:1.5;color:var(--mid)}
+        .steps li::before{content:counter(step);font-family:var(--font-heading);font-weight:700;font-size:var(--h3-size);color:var(--accent);min-width:1.5em}
+        .steps li strong{color:var(--charcoal)}
+        .clean-list{list-style:none;display:flex;flex-direction:column;gap:clamp(0.5rem,1.2vh,1rem)}
+        .clean-list li{font-size:var(--body-size);line-height:1.5;color:var(--mid);padding-left:clamp(1rem,2vw,1.5rem);position:relative}
+        .clean-list li::before{content:'';position:absolute;left:0;top:0.6em;width:6px;height:6px;border-radius:50%;background:var(--accent)}
+        .clean-list li strong{color:var(--charcoal)}
+        .accent-block{padding:clamp(1rem,2vw,1.5rem);background:var(--accent-bg);border-left:4px solid var(--accent);border-radius:0 8px 8px 0}
+        .accent-block p{color:var(--charcoal)}
+        .teal-block{padding:clamp(1rem,2vw,1.5rem);background:var(--teal-bg);border-left:4px solid var(--teal);border-radius:0 8px 8px 0}
+        .teal-block p{color:var(--charcoal)}
+        .dark{background:var(--charcoal);color:var(--cream)}
+        .dark p,.dark li{color:#b8b3ab}.dark .label{color:#7a7570}.dark h2,.dark h3{color:var(--cream)}
+        .dark .img-placeholder{background:#2a2724;border-color:#4a4540;color:#6a6560}
+        .stat{font-family:var(--font-heading);font-weight:900;font-size:clamp(2.5rem,6vw,4.5rem);line-height:1;letter-spacing:-0.03em}
+        .stat-label{font-size:var(--small-size);color:var(--light);margin-top:clamp(4px,0.5vh,8px)}
+        .thirds{display:grid;grid-template-columns:1fr 1fr 1fr;gap:clamp(1.5rem,3vw,3rem)}
+        @media(max-width:700px){.thirds{grid-template-columns:1fr}}
+        .divider{width:clamp(40px,8vw,80px);height:3px;background:var(--accent);border-radius:2px;margin:clamp(0.8rem,1.5vh,1.5rem) 0}
+        .dark .steps li{color:#b8b3ab}.dark .steps li strong{color:var(--cream)}
+        .dark .clean-list li strong{color:var(--cream)}
+        .bullet-grid{list-style:none;display:grid;grid-template-columns:max-content 1fr;column-gap:0.75rem;row-gap:clamp(0.5rem,1.2vh,1rem);font-size:var(--body-size);line-height:1.5}
+        .bullet-grid li{display:contents}
+        .bullet-grid li strong{color:var(--charcoal);padding-left:clamp(1rem,2vw,1.5rem);position:relative;align-self:baseline}
+        .bullet-grid li strong::before{content:'';position:absolute;left:0;top:0.6em;width:6px;height:6px;border-radius:50%;background:var(--accent)}
+        .bullet-grid li span{color:var(--mid);align-self:baseline}
+        .dark .bullet-grid li strong{color:var(--cream)}.dark .bullet-grid li span{color:#b8b3ab}
+        .stat-card{padding:clamp(1rem,2vw,1.5rem);background:var(--warm-white);border-radius:clamp(8px,1vw,12px);border-left:4px solid var(--accent)}
+        .stats-col{display:flex;flex-direction:column;gap:clamp(1.2rem,2.5vh,2rem);justify-content:center}
+        .slide-img{width:100%;object-fit:contain;border-radius:clamp(8px,1vw,16px);max-height:min(45vh,380px);background:var(--warm-white);display:block}
+        .slide-img.wide{aspect-ratio:16/9}.slide-img.square{aspect-ratio:1/1}
+        .dark .slide-img{background:#2a2724}
+    </style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<nav class="nav-dots" id="navDots"></nav>
+
+<!-- SLIDE 1: TITLE -->
+<section class="slide dark">
+    <div class="slide-content" style="justify-content:flex-end;padding-bottom:clamp(4rem,10vh,8rem);">
+        <p class="label reveal" style="color:var(--accent);letter-spacing:0.3em;">IS214 &middot; Enterprise Solution Management</p>
+        <h1 class="reveal" style="color:var(--cream);margin-top:clamp(0.5rem,1vh,1rem);">ESMOS Healthcare<br>Go-Live Proposal</h1>
+        <div class="divider reveal"></div>
+        <p class="reveal" style="font-family:var(--font-heading);font-style:italic;color:#a09a92;font-size:var(--body-size);max-width:min(60vw,540px);">A service strategy for Odoo operations, Moodle compliance training, and compliant support.</p>
+        <p class="reveal" style="color:#6a6560;font-size:var(--small-size);margin-top:clamp(1rem,2vh,2rem);">Team G8-T05 &middot; Phase 1 &middot; Week 10 &middot; March 2026</p>
+    </div>
+</section>
+
+<!-- SLIDE 2: THE PROBLEM -->
+<section class="slide">
+    <div class="slide-content split">
+        <div>
+            <p class="label reveal">The Business Problem</p>
+            <h2 class="reveal" style="margin-top:clamp(0.5rem,1vh,1rem);">The healthcare client approved ESMOS for production.<br><span class="accent">They cannot go live yet.</span></h2>
+            <div class="divider reveal"></div>
+            <p class="reveal">Three capabilities must be in place before launch: compliant meal operations, mandatory staff training, and centralized support &mdash; all hosted in Asia Pacific.</p>
+        </div>
+        <div class="img-placeholder wide reveal">Architecture overview diagram</div>
+    </div>
+</section>
+
+<!-- SLIDE 3: THE HARD DEPENDENCY -->
+<section class="slide">
+    <div class="slide-content" style="max-width:min(75vw,800px);">
+        <p class="label reveal">Key Constraint</p>
+        <h2 class="reveal" style="margin-top:clamp(0.5rem,1vh,1rem);">No Odoo access without<br>Moodle training completion.</h2>
+        <div class="divider reveal"></div>
+        <p class="reveal">This is a hard dependency enforced through process integration &mdash; the helpdesk service request workflow &mdash; not just a policy document.</p>
+        <div class="accent-block reveal" style="margin-top:var(--content-gap);">
+            <p>Staff must complete compliance training on Moodle and submit proof before receiving any operational Odoo account.</p>
+        </div>
+    </div>
+</section>
+
+<!-- SLIDE 4: WHO WE SERVE -->
+<section class="slide">
+    <div class="slide-content" style="max-width:min(80vw,900px);">
+        <p class="label reveal">Who Uses This Service</p>
+        <h2 class="reveal" style="margin-top:clamp(0.5rem,1vh,1rem);">Four user groups,<br>three systems.</h2>
+        <div class="divider reveal"></div>
+        <ol class="steps reveal">
+            <li><strong>Healthcare Operations Staff</strong> &mdash; 500+ using Odoo daily for meal ordering and inventory</li>
+            <li><strong>New Hires</strong> &mdash; must complete Moodle compliance training before any Odoo access</li>
+            <li><strong>IT Support Team</strong> &mdash; manages incidents, changes, and requests via compliant helpdesk</li>
+            <li><strong>CTO / Management</strong> &mdash; requires compliance assurance, uptime SLAs, governance visibility</li>
+        </ol>
+    </div>
+</section>
+
+<!-- SLIDE 5: THREE SYSTEMS -->
+<section class="slide dark">
+    <div class="slide-content">
+        <p class="label reveal" style="color:var(--accent);">Three Integrated Systems</p>
+        <h2 class="reveal" style="margin-top:clamp(0.5rem,1vh,1rem);">Odoo. Moodle. Helpdesk.</h2>
+        <div class="divider reveal"></div>
+        <div class="thirds" style="margin-top:var(--content-gap);">
+            <div class="reveal">
+                <img src="img/odoo.jpg" alt="Odoo" class="slide-img" style="aspect-ratio:16/9;object-fit:cover;object-position:top center;margin-bottom:clamp(0.8rem,1.5vh,1.2rem);">
+                <h3 style="color:var(--accent);">Odoo</h3>
+                <p style="margin-top:0.3rem;">Meal plan operations, inventory management, and the core business workflow.</p>
+            </div>
+            <div class="reveal">
+                <img src="img/moodle.png" alt="Moodle" class="slide-img" style="aspect-ratio:16/9;object-fit:cover;object-position:top center;margin-bottom:clamp(0.8rem,1.5vh,1.2rem);">
+                <h3 class="teal">Moodle</h3>
+                <p style="margin-top:0.3rem;">Mandatory compliance training LMS for 500+ staff. Internal only, 50 concurrent users.</p>
+            </div>
+            <div class="reveal">
+                <img src="img/helpdesk.jpg" alt="Helpdesk" class="slide-img" style="aspect-ratio:16/9;object-fit:cover;object-position:top center;margin-bottom:clamp(0.8rem,1.5vh,1.2rem);">
+                <h3 style="color:var(--cream);">Helpdesk</h3>
+                <p style="margin-top:0.3rem;">Unified ticketing for incidents and service requests across both systems.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SLIDE 6: ITIL 4 -->
+<section class="slide">
+    <div class="slide-content split">
+        <div>
+            <p class="label reveal">ITIL 4 Service Value Chain</p>
+            <h2 class="reveal" style="margin-top:clamp(0.5rem,1vh,1rem);">Value is created in <span class="accent">Plan</span> by making decisions that prevent costly rework.</h2>
+            <div class="divider reveal"></div>
+            <p class="reveal">The Plan activity defines shared direction for all subsequent phases. Every architecture, quality, and SLA decision made now directly shapes cost, risk, and success later.</p>
+        </div>
+        <img src="img/service%20value%20chain.png" alt="ITIL 4 Service Value Chain" class="slide-img reveal" style="aspect-ratio:866/590;object-fit:contain;background:var(--cream);max-width:100%;">
+    </div>
+</section>
+
+<!-- SLIDE 7: PLAN DECISIONS -->
+<section class="slide">
+    <div class="slide-content" style="max-width:min(80vw,900px);">
+        <p class="label reveal" style="color:var(--accent);">Plan &mdash; Active Now, Week 10</p>
+        <h2 class="reveal" style="margin-top:clamp(0.5rem,1vh,1rem);">Four strategic decisions.</h2>
+        <div class="divider reveal"></div>
+        <ol class="steps reveal">
+            <li><strong>Deployment architecture</strong> &mdash; AKS chosen based on scaling needs, compliance, and cost analysis</li>
+            <li><strong>Quality expectations</strong> &mdash; Dissatisfiers, satisfiers, and delighters defined using the Kano model</li>
+            <li><strong>SLAs and CTQs</strong> &mdash; 99.5% uptime, &lt;15 min P1 ack, &lt;24hr service requests</li>
+            <li><strong>Change strategy</strong> &mdash; Non-functional change identified from PM2 lessons learned</li>
+        </ol>
+    </div>
+</section>
+
+<!-- SLIDE 8: LATER PHASES -->
+<section class="slide">
+    <div class="slide-content" style="max-width:min(80vw,900px);">
+        <p class="label reveal">Anticipated &mdash; Not Yet Executed</p>
+        <h2 class="reveal" style="margin-top:clamp(0.5rem,1vh,1rem);">What comes after Plan.</h2>
+        <div class="divider reveal"></div>
+        <ul class="bullet-grid reveal">
+            <li><strong>Phase 2: Obtain / Build</strong><span>&mdash; Deploy AKS cluster with Odoo, Moodle, PostgreSQL. Infrastructure walkthrough.</span></li>
+            <li><strong>Phase 3: Design &amp; Transition</strong><span>&mdash; Execute non-functional change through formal RFC with rollback plan.</span></li>
+            <li><strong>Phase 4: Deliver &amp; Support</strong><span>&mdash; Live helpdesk, monitoring, incident response.</span></li>
+        </ul>
+        <div class="teal-block reveal" style="margin-top:var(--content-gap);">
+            <p><strong>Continual Improvement:</strong> PM2 web defacement &rarr; root cause analysis &rarr; informs Phase 3 change. Each phase feeds back into Plan.</p>
+        </div>
+    </div>
+</section>
+
+<!-- SLIDE 9: AKS -->
+<section class="slide dark">
+    <div class="slide-content split">
+        <div>
+            <p class="label reveal" style="color:var(--accent);">Deployment Approach</p>
+            <h2 class="reveal" style="margin-top:clamp(0.5rem,1vh,1rem);">Azure Kubernetes Service.</h2>
+            <div class="divider reveal"></div>
+            <p class="reveal">Option 4 &mdash; self-scaling Kubernetes in Southeast Asia. Three layers: Nginx Ingress for routing, application pods for Odoo and Moodle, and PostgreSQL on persistent storage.</p>
+        </div>
+        <div class="img-placeholder wide reveal">AKS architecture diagram</div>
+    </div>
+</section>
+
+<!-- SLIDE 10: WHY AKS -->
+<section class="slide">
+    <div class="slide-content" style="max-width:min(80vw,900px);">
+        <p class="label reveal">Why AKS Over Simpler Options</p>
+        <h2 class="reveal" style="margin-top:clamp(0.5rem,1vh,1rem);">Five justifications.</h2>
+        <div class="divider reveal"></div>
+        <ul class="bullet-grid reveal">
+            <li><strong>Horizontal Pod Autoscaler</strong><span>&mdash; meets 50-concurrent-user training days without over-provisioning</span></li>
+            <li><strong>Rolling updates</strong><span>&mdash; zero-downtime deployments, critical for healthcare uptime</span></li>
+            <li><strong>Self-healing</strong><span>&mdash; auto-restarts failed pods, recovery in seconds not minutes</span></li>
+            <li><strong>Compliance</strong><span>&mdash; single cluster in Southeast Asia. K8s RBAC enforces least-privilege</span></li>
+            <li><strong>Cost</strong><span>&mdash; free control plane. B2s node ~$30/month within student credits</span></li>
+        </ul>
+    </div>
+</section>
+
+<!-- SLIDE 11: TESTING PROPOSAL -->
+<section class="slide">
+    <div class="slide-content" style="max-width:min(80vw,900px);">
+        <p class="label reveal" style="color:var(--teal);">Validation Plan</p>
+        <h2 class="reveal" style="margin-top:clamp(0.5rem,1vh,1rem);">Every claim gets tested before go-live.</h2>
+        <div class="divider reveal"></div>
+        <ul class="bullet-grid reveal">
+            <li><strong>Training platform capacity</strong><span>&mdash; 50 concurrent Moodle users complete a course without degradation. Measured via k6 or Locust against Moodle endpoint. Pass: page load remains under SLA threshold.</span></li>
+            <li><strong>Helpdesk throughput</strong><span>&mdash; Odoo handles concurrent ticket submissions from guest portal users during peak onboarding window. Leverages existing load test baseline from PM1 staging tests.</span></li>
+            <li><strong>WAF latency impact</strong><span>&mdash; before/after response time comparison with ModSecurity enabled. Confirms security layer does not degrade user experience beyond acceptable margin.</span></li>
+            <li><strong>Self-healing recovery</strong><span>&mdash; pod failure simulation (<code style="font-family:monospace;font-size:0.9em;">kubectl delete pod</code>) with measured time to automatic replacement. Validates AKS self-healing claim and confirms MTTR under SLA target.</span></li>
+        </ul>
+        <div class="teal-block reveal" style="margin-top:var(--content-gap);">
+            <p>All tests to be executed and evidenced during Week 12 live demo. This slide presents our testing strategy, not results.</p>
+        </div>
+    </div>
+</section>
+
+<!-- SLIDE 12: RFC 1 — WAF + NGINX -->
+<section class="slide">
+    <div class="slide-content split">
+        <div>
+            <p class="label reveal" style="color:var(--accent);">RFC 1 &mdash; Non-Functional Change</p>
+            <h2 class="reveal" style="margin-top:clamp(0.5rem,1vh,1rem);">Nginx reverse proxy with WAF.</h2>
+            <div class="divider reveal"></div>
+            <ul class="bullet-grid reveal">
+                <li><strong>Static asset caching</strong><span>&mdash; Nginx serves CSS, JS, images from memory</span></li>
+                <li><strong>Response compression</strong><span>&mdash; gzip reduces bandwidth ~60&ndash;70%</span></li>
+                <li><strong>Rate limiting + WAF</strong><span>&mdash; OWASP CRS blocks SQLi, XSS, brute-force</span></li>
+            </ul>
+            <div class="teal-block reveal" style="margin-top:var(--content-gap);">
+                <p><strong>Success criteria:</strong> before/after load test and attack simulation to be demonstrated during Week 12 live demo.</p>
+            </div>
+        </div>
+        <div class="img-placeholder wide reveal">WAF architecture diagram</div>
+    </div>
+</section>
+
+<!-- SLIDE 13: WHY THIS CHANGE -->
+<section class="slide dark">
+    <div class="slide-content" style="max-width:min(80vw,900px);">
+        <p class="label reveal" style="color:var(--accent);">The ITIL Lifecycle Loop</p>
+        <h2 class="reveal" style="margin-top:clamp(0.5rem,1vh,1rem);">Why this change &mdash;<br>evidence, not theory.</h2>
+        <div class="divider reveal"></div>
+        <ol class="steps reveal">
+            <li><strong>PM2 Incident</strong> &mdash; web defacement attack compromised production Odoo</li>
+            <li><strong>Problem Management</strong> &mdash; RCA found zero application-layer defenses</li>
+            <li><strong>Change Management</strong> &mdash; RFC to implement WAF as preventive measure</li>
+            <li><strong>Continual Improvement</strong> &mdash; monitor blocked threats, validate effectiveness</li>
+        </ol>
+    </div>
+</section>
+
+<!-- SLIDE 14: RFC 2 — MFA ENFORCEMENT -->
+<section class="slide">
+    <div class="slide-content split">
+        <div>
+            <p class="label reveal" style="color:var(--accent);">RFC 2 &mdash; Process Change</p>
+            <h2 class="reveal" style="margin-top:clamp(0.5rem,1vh,1rem);">MFA enforcement on all Odoo accounts.</h2>
+            <div class="divider reveal"></div>
+            <ul class="bullet-grid reveal">
+                <li><strong>What changes</strong><span>&mdash; TOTP authenticator required before any operational Odoo account activates</span></li>
+                <li><strong>Why separate from RFC 1</strong><span>&mdash; process-level change with user friction; different risk profile from the infrastructure-only WAF change</span></li>
+                <li><strong>Approval path</strong><span>&mdash; normal change requiring CAB sign-off; estimated 2 weeks including change management</span></li>
+                <li><strong>Workflow impact</strong><span>&mdash; adds one step to onboarding BPMN after Odoo account creation</span></li>
+            </ul>
+        </div>
+        <div>
+            <div class="teal-block reveal">
+                <p><strong>Risk: Medium.</strong> User friction may delay onboarding if staff encounter TOTP setup issues. Mitigation: helpdesk support during rollout window.</p>
+            </div>
+            <div class="accent-block reveal" style="margin-top:var(--content-gap);">
+                <p><strong>Source:</strong> Week 6 homework identified MFA as the permanent fix for the account privilege abuse that enabled the PM2 web defacement incident.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SLIDE 15: OPERATIONS -->
+<section class="slide">
+    <div class="slide-content split-wide">
+        <div>
+            <p class="label reveal">Operations &amp; Support</p>
+            <h2 class="reveal" style="margin-top:clamp(0.5rem,1vh,1rem);">Onboarding workflow.</h2>
+            <div class="divider reveal"></div>
+            <ol class="steps reveal">
+                <li>Staff submits <strong>Odoo Access Request</strong> via helpdesk guest portal</li>
+                <li>Support Manager logs <strong>service request ticket</strong></li>
+                <li>Staff completes <strong>Moodle compliance training</strong></li>
+                <li>Staff submits <strong>completion proof</strong> via ticket update</li>
+                <li>Support Manager verifies Moodle records &mdash; if incomplete, <strong>returns with specific modules required</strong></li>
+                <li>System Configurator creates <strong>Odoo account</strong> with least-privilege role and confirms on ticket</li>
+                <li>Staff receives credentials and completes <strong>mandatory password rotation</strong> on first login</li>
+            </ol>
+        </div>
+        <div class="img-placeholder reveal" style="aspect-ratio:3/4;">Workflow screenshot</div>
+    </div>
+</section>
+
+<!-- SLIDE 16: INCIDENT HANDLING -->
+<section class="slide">
+    <div class="slide-content" style="max-width:min(75vw,800px);">
+        <p class="label reveal">Across Both Systems</p>
+        <h2 class="reveal" style="margin-top:clamp(0.5rem,1vh,1rem);">Incident and change handling.</h2>
+        <div class="divider reveal"></div>
+        <p class="reveal">Any disruption to Odoo or Moodle triggers a helpdesk ticket with RASCI-defined escalation. Support Manager triages, System Configurator resolves, Security Manager consulted for security events.</p>
+        <p class="reveal" style="margin-top:clamp(0.5rem,1vh,1rem);">All non-emergency changes go through the RFC process &mdash; documented in helpdesk, reviewed by Change Authority, with rollback plan before execution.</p>
+    </div>
+</section>
+
+<!-- SLIDE 17: SLAs -->
+<section class="slide dark">
+    <div class="slide-content">
+        <p class="label reveal" style="color:var(--accent);">What Success Looks Like</p>
+        <h2 class="reveal" style="margin-top:clamp(0.5rem,1vh,1rem);">Three SLA targets.</h2>
+        <div class="divider reveal"></div>
+        <div class="thirds" style="margin-top:var(--content-gap);">
+            <div class="reveal"><div class="stat" style="color:var(--accent);">99.5%</div><div class="stat-label" style="color:#b8b3ab;">Service Availability</div><p style="margin-top:0.5rem;">Odoo + Moodle uptime, Mon&ndash;Fri 8am&ndash;8pm SGT via Azure Monitor.</p></div>
+            <div class="reveal"><div class="stat" style="color:var(--accent);">&lt;15m</div><div class="stat-label" style="color:#b8b3ab;">P1 Incident Response</div><p style="margin-top:0.5rem;">Acknowledge 15 min. Resolve within 2 hours.</p></div>
+            <div class="reveal"><div class="stat" style="color:var(--accent);">&lt;24h</div><div class="stat-label" style="color:#b8b3ab;">Service Request Fulfillment</div><p style="margin-top:0.5rem;">Moodle access 4 hrs. Odoo 24 hrs after training completion.</p></div>
+        </div>
+    </div>
+</section>
+
+<!-- SLIDE 18: MONITORING STRATEGY -->
+<section class="slide">
+    <div class="slide-content split">
+        <div>
+            <p class="label reveal" style="color:var(--teal);">What we monitor</p>
+            <h2 class="reveal" style="margin-top:clamp(0.5rem,1vh,1rem);">We detect problems<br>before staff experience them.</h2>
+            <div class="divider reveal"></div>
+            <ul class="bullet-grid reveal">
+                <li><strong>Service availability</strong><span>&mdash; synthetic health checks hitting Odoo and Moodle endpoints every 30 s. Alert fires within 1 min if either is unresponsive. (Better Stack)</span></li>
+                <li><strong>Infrastructure health</strong><span>&mdash; CPU, memory, disk, pod status via Azure Monitor. Warning alerts at 70% utilisation to catch issues before they become outages.</span></li>
+                <li><strong>Security events</strong><span>&mdash; WAF blocked-request counts confirm application-layer protection is active. Spikes trigger investigation.</span></li>
+            </ul>
+        </div>
+        <div>
+            <p class="label reveal" style="color:var(--teal);">Why this matters</p>
+            <ul class="clean-list reveal" style="margin-top:clamp(0.8rem,1.5vh,1.2rem);">
+                <li><strong>LTA lesson applied</strong> &mdash; their buses ran on schedule but arrival data was wrong. Infrastructure uptime alone misses service quality failures. We monitor what staff actually experience: can they log in, load pages, submit tickets?</li>
+                <li><strong>PM2 lesson applied</strong> &mdash; the web defacement went undetected because we had no content monitoring. Post-WAF, we monitor both blocked threats and whether service content is intact.</li>
+                <li><strong>Audit-ready</strong> &mdash; monitoring dashboards provide evidence for SLA reporting and incident post-mortems. Every alert is logged.</li>
+            </ul>
+            <div class="teal-block reveal" style="margin-top:var(--content-gap);">
+                <p>Monitoring closes the visibility gap from PM2 &mdash; we now detect threats blocked and service degradation, not just outages.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SLIDE 19: COST & RISK -->
+<section class="slide">
+    <div class="slide-content split">
+        <div>
+            <p class="label reveal" style="color:var(--teal);">Cost &amp; Value</p>
+            <h2 class="reveal" style="margin-top:clamp(0.5rem,1vh,1rem);">~$30/month.<br>Zero licensing.</h2>
+            <div class="divider reveal"></div>
+            <ul class="bullet-grid reveal">
+                <li><strong>Total infra cost</strong><span>&mdash; ~$30/month with free control plane; self-healing eliminates manual recovery overhead</span></li>
+                <li><strong>Cost guardrails</strong><span>&mdash; Azure alerts at 60% and 80% thresholds; ~3 months runway on $100 credits</span></li>
+                <li><strong>Staff efficiency</strong><span>&mdash; AKS auto-recovery replaces need for 24/7 manual monitoring by a 5-person team</span></li>
+                <li><strong>Zero licensing</strong><span>&mdash; entire stack (Odoo, Moodle, Nginx, ModSecurity) is open-source</span></li>
+            </ul>
+        </div>
+        <div>
+            <p class="label reveal" style="color:var(--accent);">Key Risks</p>
+            <h3 class="reveal" style="margin-top:clamp(0.5rem,1vh,1rem);">Mitigated, not ignored.</h3>
+            <ul class="bullet-grid reveal" style="margin-top:clamp(0.8rem,1.5vh,1.2rem);">
+                <li><strong>AKS learning curve</strong><span>&mdash; team has Azure DevOps and Docker experience; Kubernetes is an incremental step</span></li>
+                <li><strong>Credit burndown</strong><span>&mdash; Azure Cost alerts at 60% and 80%; deallocate nodes outside business hours</span></li>
+                <li><strong>WAF false positives</strong><span>&mdash; back-out removes ModSecurity without touching Odoo or Moodle</span></li>
+                <li><strong>Scope management</strong><span>&mdash; all RFC work tracked via helpdesk tickets with rollback plan required before execution</span></li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- SLIDE 20: SECURITY -->
+<section class="slide dark">
+    <div class="slide-content" style="max-width:min(82vw,920px);">
+        <p class="label reveal" style="color:var(--accent);">Security Posture</p>
+        <h2 class="reveal" style="margin-top:clamp(0.5rem,1vh,1rem);">Defense in depth.</h2>
+        <div class="divider reveal"></div>
+        <ul class="bullet-grid reveal">
+            <li><strong>Data residency</strong><span>&mdash; all workloads in Azure Southeast Asia, satisfying regulatory compliance requirements</span></li>
+            <li><strong>Access control</strong><span>&mdash; no Odoo access without verified Moodle training completion, enforced through the onboarding workflow</span></li>
+            <li><strong>Layered defense</strong><span>&mdash; Azure RBAC + K8s namespaces + Odoo roles; a breach in one layer does not compromise the others</span></li>
+            <li><strong>WAF (pending RFC 1)</strong><span>&mdash; blocks common web attacks before they reach applications; closes the gap identified in the PM2 incident</span></li>
+            <li><strong>MFA (pending RFC 2)</strong><span>&mdash; authenticator app required for all operational accounts; prevents unauthorized access even if credentials are compromised</span></li>
+            <li><strong>Audit trail</strong><span>&mdash; every ticket, request, and incident tracked to closure via the compliant helpdesk</span></li>
+        </ul>
+    </div>
+</section>
+
+<!-- SLIDE 21: CLOSING -->
+<section class="slide">
+    <div class="slide-content" style="justify-content:center;align-items:center;text-align:center;">
+        <p class="label reveal" style="color:var(--accent);letter-spacing:0.3em;">Thank You</p>
+        <h2 class="reveal" style="margin-top:clamp(0.5rem,1vh,1rem);max-width:min(70vw,700px);">Questions & Discussion</h2>
+        <div class="divider reveal" style="margin-left:auto;margin-right:auto;"></div>
+        <p class="reveal" style="max-width:min(50vw,500px);margin:0 auto;">Team G8-T05 &middot; IS214 Enterprise Solution Management &middot; March 2026</p>
+    </div>
+</section>
+
+<script>
+class SP{constructor(){this.s=document.querySelectorAll('.slide');this.c=0;const o=new IntersectionObserver(e=>{e.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');this.c=[...this.s].indexOf(e.target);this.ud();this.up()}})},{threshold:0.5});this.s.forEach(s=>o.observe(s));document.addEventListener('keydown',e=>{if(['ArrowDown','ArrowRight',' ','PageDown'].includes(e.key)){e.preventDefault();this.go(this.c+1)}if(['ArrowUp','ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();this.go(this.c-1)}});let y=0;document.addEventListener('touchstart',e=>{y=e.touches[0].clientY});document.addEventListener('touchend',e=>{const d=y-e.changedTouches[0].clientY;if(Math.abs(d)>50)d>0?this.go(this.c+1):this.go(this.c-1)});let l=0;document.addEventListener('wheel',e=>{const n=Date.now();if(n-l<800)return;l=n;e.deltaY>0?this.go(this.c+1):e.deltaY<0&&this.go(this.c-1)},{passive:true});this.p=document.getElementById('progressBar');const n=document.getElementById('navDots');this.s.forEach((_,i)=>{const d=document.createElement('button');d.className='nav-dot'+(i===0?' active':'');d.onclick=()=>this.go(i);n.appendChild(d)});this.d=n.querySelectorAll('.nav-dot');this.up()}
+ud(){if(this.d)this.d.forEach((d,i)=>d.classList.toggle('active',i===this.c))}
+up(){if(this.p)this.p.style.width=((this.c+1)/this.s.length*100)+'%'}
+go(i){if(i<0||i>=this.s.length)return;this.c=i;this.s[i].scrollIntoView({behavior:'smooth'})}}
+new SP();
+</script>
+</body>
+</html>
